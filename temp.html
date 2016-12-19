@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>my-project</title>
+  </head>
+  <body>
+    <div id = 'my-app'>
+      <app></app>
+    </div>
+
+
+    <!-- built files will be auto injected -->
+    <canvas id="myCanvas" width="800" height="800" style="border:1px solid #d3d3d3;">
+    您的浏览器不支持 HTML5 canvas 标签。</canvas>
+  <div id='mask'></div>
+  <input id='palette' type="color">
+  <p id='status'></p>
+  <button id="brush">画笔工具</button>
+  <button id="ellipse">椭圆工具</button>
+  <button id="rect">矩形工具</button>
+  <button id="paintPot">填充工具</button>
+    <div id="exampleA">
+      {{ message }}
+    </div>
+    <div id="exampleB">
+  		<span :title="message">
+  		{{message}}
+  		</span>
+      <a :href="someUrl">click me</a>
+	  </div>
+
+
+    <div id="app-3">
+      <p v-if="seen">Now you see me</p>
+    </div>
+    <div id="app-4">
+      <ol>
+        <li v-for="todo in todos">
+          {{ todo.text }}
+        </li>
+      </ol>
+    </div>
+    <div id="app-5">
+      <p>{{ message }}</p>
+      <button v-on:click="reverseMessage">Reverse Message</button>
+    </div>
+    <div id="app-6">
+      <p>{{ message | capitalize }}</p>
+      <input v-model.number="message">
+    </div>
+
+    <div id = 'todo'>
+      <ul>
+        <!-- Create an instance of the todo-item component -->
+        <todo-item></todo-item>
+      </ul>
+    </div>
+    <div id = 'todoList'>
+      <ol>
+        <!-- Create an instance of the todo-item component -->
+        <todo-item2 v-for = 'item in groceryList' v-bind:parent-prop = "item"></todo-item2>
+      </ol>
+    </div>
+    <div id = 'events' @click = 'counter'>
+      <div @click.self = 'counter'>click Me {{count}}<button>childButton</button></div>
+      <p> click Me {{count}} </p>
+    </div>
+
+
+    <div id = 'computedProp'>
+      <p>Original message: "{{ message }}"</p>
+      <input v-model = 'message'>
+      <p>Computed reversed message: "{{ reversedMessage }}"</p>
+      <p> {{now}}</p>
+    </div>
+
+
+
+    <div id="todo-list-example">
+      <input
+        v-model="newTodoText"
+        v-on:keyup.enter="addNewTodo"
+        placeholder="Add a todo"
+      >
+      <ul>
+        <li
+          is="todo-item"
+          v-for="(index, todo) in todos"
+          v-bind:title="todo"
+          v-on:remove="todos.splice(index, 1)"
+        ></li>
+      </ul>
+
+      <li v-for="n in even(numbers)">{{ n }}</li>
+    </div>
+    <h3>Form:</h3>
+    <div id = "form">
+      <input type="checkbox" id="checkbox" v-model="checked">
+      <label for="checkbox">{{ checked }}</label>
+
+      <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+      <label for="jack">Jack</label>
+      <input type="checkbox" id="john" value="John" v-model="checkedNames">
+      <label for="john">John</label>
+      <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+      <label for="mike">Mike</label>
+      <br>
+      <span>Checked names: {{ checkedNames }}</span>
+    </div>
+    <h3>ComponentEg:</h3>
+    <div id = 'componentEg'>
+      <my-component></my-component>
+      <custom></custom>
+    </div>
+
+    <div id="example-2">
+      <simple-counter></simple-counter>
+      <simple-counter></simple-counter>
+      <simple-counter></simple-counter>
+    </div>
+    <h3>Communication:</h3>
+
+    <div id= "communication">
+    <!-- father to child   by props-->
+      <input v-model = "hello">
+      <child :message-from-prop="hello"  :prop2 = "444"> {{ fatherData }}</child>
+      <!-- child to father by on & emit-->
+
+      <p>{{ total }}</p>
+      <button-counter v-on:increment="incrementTotal"></button-counter>
+      <button-counter v-on:increment="incrementTotal"></button-counter>
+
+      <br/>
+      <currency-input v-model="price"></currency-input>
+    </div>
+
+
+  </body>
+</html>
+
+<script src="static/jquery-3.1.1.min.js" type="text/javascript"></script>
+<script>
+
+
+$(function(){
+
+
+$("#brush").click(function(){
+  tool = 'brush'
+})
+
+$("#ellipse").click(function(){
+  tool = 'ellipse'
+})
+
+$("#rect").click(function(){
+  tool = 'rect'
+})
+
+$("#paintPot").click(function(){
+  tool = 'paintPot'
+})
+
+var c=$("#myCanvas");
+var oGC=c[0].getContext("2d");
+
+
+var isStart = true
+var startX,
+    startY,
+    moveX,
+    moveY,
+    distanceX,
+    distanceY,
+    lastX,
+    lastY;
+
+var canvasDate = [];
+var tool = 'brush'
+
+
+function getRGB(hex){
+    var rgb=[0,0,0];
+    if(/#(..)(..)(..)/g.test(hex)){
+        rgb=[parseInt(RegExp.$1,16),parseInt(RegExp.$2,16),parseInt(RegExp.$3,16),255];
+    };
+    return rgb;
+}
+
+c.click(function(e){
+
+  // x-9,y-26
+  // console.log('start x position:'+ (e.pageX - 9))
+  // console.log('start y position:'+ (e.pageY - 267))
+
+
+  switch (tool) {
+    case 'paintPot':
+        $('#status').hide()
+        window.setTimeout(function(){
+          if($('#palette').val() !='#000000'){
+            scanLine(e.pageX,e.pageY,getRGB($('#palette').val()),[0,0,0,255])
+          }
+          else{
+            $('#status').show()
+            alert('请不要用黑色填充')
+          }
+        },100)
+
+     // console.log(oGC.getImageData(e.pageX-11,e.pageY-269,1,1));
+      break;
+    case 'brush':
+      if(isStart){
+        startX = e.pageX
+        startY = e.pageY
+        // oGC.clearRect(3,3, 796,796)
+        isStart = false
+        lastX = startX
+        lastY = startY
+        console.log(startX,startY)
+      }
+      else {
+        console.log(startX,startY)
+        line(oGC, lastX, lastY, startX, startY)
+        isStart = true
+      }
+      break;
+    case 'ellipse':
+      if(isStart){
+        startX = e.pageX
+        startY = e.pageY
+        isStart = false
+      }
+      else{
+        // console.log('end x position:'+ e.pageX)
+        // console.log('end y position:'+ e.pageY)
+
+        isStart = true
+     }
+      break;
+    case 'rect':
+      if(isStart){
+        startX = e.pageX
+        startY = e.pageY
+        isStart = false
+
+      }
+      else{
+        // console.log('end x position:'+ e.pageX)
+        // console.log('end y position:'+ e.pageY)
+
+        isStart = true
+        canvasDate.push([startX, startY, distanceX, distanceY])
+      }
+      break;
+    default:
+
+  }
+
+
+})
+
+c.mousemove(function(e){
+  moveY = e.pageY
+  moveX = e.pageX
+
+  switch (tool) {
+    case 'brush':
+      if(!isStart){
+        line(oGC, lastX, lastY, moveX, moveY)
+        lastX = moveX
+        lastY = moveY
+      }
+      break;
+    case 'ellipse':
+      if(!isStart){
+        oGC.clearRect(3,3, 796,796)
+
+        distanceX = moveX - startX
+        distanceY = moveY - startY
+        EllipseOne(oGC, startX + distanceX / 2 - 11 , startY + distanceY / 2 - 269, Math.abs(distanceX / 2), Math.abs(distanceY / 2));
+      }
+      break;
+    case 'rect':
+      if(!isStart){
+        oGC.clearRect(3,3, 796,796)
+        for (let i in canvasDate) {
+          // console.log('draw' + canvasDate[i])
+          rect(oGC, canvasDate[i][0] - 11, canvasDate[i][1]- 269, canvasDate[i][2], canvasDate[i][3]);
+        }
+        distanceX = moveX - startX
+        distanceY = moveY - startY
+        rect(oGC, startX - 11 , startY - 269, distanceX,distanceY);
+
+      }
+      break;
+  }
+
+
+})
+
+
+function line(context, x1, y1, x2, y2) {
+  context.beginPath();
+  context.lineWidth = 3;
+  context.moveTo(x1 - 10,y1 - 269);
+  context.lineTo(x2 - 10,y2 - 269);
+  context.closePath();
+  context.stroke();
+}
+
+
+function circle(context, x, y, a) { // x,y是坐标;a是半径
+    var r = 0.09; // ①注意：此处r可以写死，不过不同情况下写死的值不同
+    context.beginPath();
+    context.moveTo(x + a, y);
+    for(var i = 0; i < 2 * Math.PI; i += r) {
+        context.lineTo(x + a * Math.cos(i), y + a * Math.sin(i));
+    }
+    context.closePath();
+    context.stroke();
+}
+
+function rect(context, x, y,x2,y2) { // x,y是坐标;a是半径
+    context.beginPath();
+    context.rect(x,y,x2,y2)
+    context.closePath();
+    context.stroke();
+}
+
+// EllipseOne(oGC, 300, 100, 200,100);
+function EllipseOne(context, x, y, a, b) {
+    var step = (a > b) ? 1 / a : 1 / b;
+    context.beginPath();
+    context.moveTo(x + a, y);
+    for(var i = 0; i < 2 * Math.PI; i += step) {
+        context.lineTo(x + a * Math.cos(i), y + b * Math.sin(i));
+    }
+    context.closePath();
+    context.stroke();
+}
+
+var seedStack = []
+// rect(oGC, 350,200,100,150);
+// rect(oGC, 300,300,200,100);
+
+rect(oGC,1,1,799,799);
+// rect(oGC, 40,20,20,35);
+// rect(oGC, 30,50,40,20);
+
+$('#status').text('llllllllllllll')
+$('#status').show()
+function scanLine(x,y,rgba,compareColor) {
+
+  seedStack.push([x-9,y-267])
+
+  //step 2
+  var currenSeed;
+  var xLeft,
+      xRight;
+
+  while (seedStack.length) {
+    if (seedStack.length > 10000) return
+    currenSeed = seedStack.pop()
+    var targetColor = oGC.getImageData(currenSeed[0], currenSeed[1],1,1).data
+    // if (rgba[0]==targetColor[0]) {
+    //   $('#status').show()
+    //   return
+    // }
+    if(currenSeed[0]!=currenSeed[0]){
+      xLeft = currenSeed[0]
+      xRight = currenSeed[0] - 1
+    }
+    else {
+      // isFill = false
+
+      xLeft = currenSeed[0]
+      xRight = currenSeed[0]
+    }
+    //find xleft
+    i = 1
+    targetColor = oGC.getImageData(currenSeed[0]-i, currenSeed[1],1,1).data
+    while(targetColor[3] < 10){
+      fillColor(currenSeed[0]-i,currenSeed[1],rgba)
+      xLeft = currenSeed[0]-i
+      i++
+      targetColor = oGC.getImageData(currenSeed[0]-i, currenSeed[1],1,1).data
+    }
+
+    //find xRight
+    i = 0
+    targetColor = oGC.getImageData(currenSeed[0]+i, currenSeed[1],1,1).data
+    while(targetColor[3] < 10){
+      fillColor(currenSeed[0]+i,currenSeed[1],rgba)
+      xRight = currenSeed[0]+i
+      i++
+      targetColor = oGC.getImageData(currenSeed[0]+i, currenSeed[1],1,1).data
+    }
+    // console.log(xLeft,xRight)
+
+
+    //find y+1's seed
+    candidateSeed = 0
+    for (var i = xLeft; i <= xRight; i++) {
+      targetColor = oGC.getImageData(i, currenSeed[1]+1,1,1).data
+      if(targetColor[3] < 10 && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] ) ){
+        candidateSeed = i
+      }
+      else {
+        targetColor = oGC.getImageData(i - 1, currenSeed[1]+1,1,1).data
+        if(targetColor[3] < 10 && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] )){
+          // fillColor(candidateSeed+100,currenSeed[1]+1,[0,255,255,255])
+          seedStack.push([i - 1,currenSeed[1]+1])
+        }
+      }
+    }
+    if(candidateSeed){
+      // fillColor(candidateSeed+100,currenSeed[1]+1,[0,255,0,255])
+      seedStack.push([candidateSeed,currenSeed[1]+1])
+      // console.log(candidateSeed,currenSeed[1]+1)
+    }
+
+    //find y-1's seed
+    candidateSeed = 0
+    for (var i = xLeft; i <= xRight; i++) {
+      targetColor = oGC.getImageData(i, currenSeed[1]-1,1,1).data
+      if(targetColor[3] < 10 && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] )){
+        candidateSeed = i
+      }
+      else {
+        targetColor = oGC.getImageData(i - 1, currenSeed[1]-1,1,1).data
+        if(targetColor[3] < 10 && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] ) ){
+          // fillColor(candidateSeed+100,currenSeed[1]-1,[0,255,255,255])
+          seedStack.push([i - 1,currenSeed[1]-1])
+          // console.log(i - 1,currenSeed[1]-1)
+        }
+      }
+    }
+    if(candidateSeed){
+      // fillColor(candidateSeed+100,currenSeed[1]-1,[0,255,0,255])
+      seedStack.push([candidateSeed,currenSeed[1]-1])
+      // console.log(candidateSeed,currenSeed[1]-1)
+    }
+
+  }
+
+  $('#status').show()
+}
+
+function fillColor(x, y, rgba){
+  var imgData=oGC.createImageData(1,1);
+  imgData.data[0]=rgba[0];
+  imgData.data[1]=rgba[1];
+  imgData.data[2]=rgba[2];
+  imgData.data[3]=rgba[3];
+  oGC.putImageData(imgData,x, y);
+
+}
+
+  // function fillColor(x,y,rgba,compareColor) {
+  //
+  //   var imgData=oGC.createImageData(1,1);
+  //   var targetColor = oGC.getImageData(x-9, y-267,1,1).data
+  //   if (targetColor[3] < 100 && rgba[0]!=targetColor[0]) {
+  //
+  //     imgData.data[0]=rgba[0];
+  //     imgData.data[1]=rgba[1];
+  //     imgData.data[2]=rgba[2];
+  //     imgData.data[3]=rgba[3];
+  //     oGC.putImageData(imgData,x-9, y-267);
+  //     fillColor(x+1,y,rgba,compareColor)
+  //     fillColor(x-1,y,rgba,compareColor)
+  //     fillColor(x,y+1,rgba,compareColor)
+  //     fillColor(x,y-1,rgba,compareColor)
+  //
+  //   }
+  //   else return
+  // }
+
+})
+</script>
