@@ -15,7 +15,7 @@ def Test():
   outfile="imageNameList.txt"
   wildcard = ".jpg .jpeg .PNG"
 
-  file = open(outfile,"a")
+  file = open(outfile,"wb")
   if not file:
     print ("cannot open the file %s for writing" % outfile)
   ListFilesToTxt(dir,file,wildcard, 1)
