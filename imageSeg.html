@@ -124,10 +124,15 @@ button{
 color: #fff;
 }
 #markDiv{
-	margin-top: 60px;
+	margin-top: 20px;
   width: 150px;
 	height: 100%;
 	margin-right: 100px;
+}
+
+#markDiv p {
+	font-size: 15px;
+	opacity: 0.8;
 }
 #storeDiv{
 	flex:3;
@@ -394,11 +399,13 @@ src: url('font/fzyy.TTF'); /* IE9+ */
 
 		</div>
 		<div id= 'markDiv'>
-			<input class='newCateInput' placeholder="在这里添加标签"/>
-			<input id="color" type="color"/>
-
+			<p>这里选择标签配置文件</p>
+			<input type="file" id="ConfigFile" />
+			<!-- <input class='newCateInput' placeholder="在这里添加标签"/>
+			<input id="color" type="color"/> -->
+<!--
 			<a id ="addCate" class="dowSLit" >+</a>
-			<a id ="delCate" class="dowSLit" >-</a>
+			<a id ="delCate" class="dowSLit" >-</a> -->
 		</div>
 		<div id= 'storeDiv'>
 			<select multiple id ="toolsBar">
@@ -505,11 +512,9 @@ $(function(){
 		// $("#toolsBar option:checked").remove()
 		$('#toolsBar option')[1].selected = false
 		$('#toolsBar option')[0].selected = true
-	},50)
-
-
-
+		},50)
 	})
+
 	$("#genFileList").click(function(){
 		if ($("#fileListInput").val() ){
 			var fileArr = $("#fileListInput").val().split("\n");
@@ -604,13 +609,13 @@ $(function(){
 	});
 
 
-$('#mask').hide()
-$('#mask2').hide()
-var canvasDom=$("#myCanvas");
-var oGC=canvasDom[0].getContext("2d");
-oGC.lineWidth = 3;
-var oriWidth,
-		oriHeight;
+	$('#mask').hide()
+	$('#mask2').hide()
+	var canvasDom=$("#myCanvas");
+	var oGC=canvasDom[0].getContext("2d");
+	oGC.lineWidth = 3;
+	var oriWidth,
+		  oriHeight;
 // oGC.strokeStyle = 'rgba(14,255,7,1)';
 
 	$("#preview").on('load', function() {
@@ -622,10 +627,10 @@ var oriWidth,
 
 
 	 $('#mask').css({width:oriWidth,height:oriHeight})
-	//  debugger
-	//  $('#mask').show()
+		//  debugger
+		//  $('#mask').show()
 	 $('#mask2').css({width:oriWidth,height:oriHeight})
-	// $('#mask')[0].height = oriHeight
+		// $('#mask')[0].height = oriHeight
 			rect(oGC,1,1,oriWidth-2,oriHeight-2);
 		let screenWidth = document.body.clientWidth
 		let screenHeight = document.body.clientHeight
@@ -784,16 +789,12 @@ var oriWidth,
 
 	});
 
-
-
-
 	$("#category").on("click","option",function(){
 		tool = 'paintPot'
 		// $("#toolsBar option:checked").remove()
 		$('#toolsBar option')[0].selected = false
 		$('#toolsBar option')[1].selected = true
 	})
-
 
 	$("#fileList").on("click","option",function(){
 		console.log('onchange')
@@ -836,6 +837,7 @@ var oriWidth,
 
 		// });
 	});
+
 	$('#upload').change(function(){
 
 		if($('#auto').prop('checked'))
@@ -852,8 +854,6 @@ var oriWidth,
 		$("#preview").attr("src","data/"+ fileName);
 	});
 
-
-
 	function getNaturalWidth(img) {
     var image = new Image()
     image.src = img.src
@@ -867,12 +867,6 @@ var oriWidth,
     var naturalHeight = image.height
     return naturalHeight
 	}
-
-
-
-	// $("#fileListInput").val('desktop.jpg\nBG1.jpg');
-
-	// $("#genFileList").click();
 
 	$("#file").on("change", function () {
 		// console.log(files)
@@ -931,44 +925,75 @@ var oriWidth,
 					}
 					reader.readAsDataURL(file);
 			}
-	}
-	})
+		}
+	});
 
- // $("#fileListInput").val('desktop.jpg')
- // $("#genFileList").click();
+	$("#ConfigFile").on("change", function () {
+		//gen categoryArr from ConfigFile
+		var files = $(this)[0].files
+		if (files.length) {
+			var file = files[0];
+			var reader = new FileReader();
+			if (/text\/\w+/.test(file.type)) {
+					reader.onload = function() {
+						resultArr = this.result.trim().split('\n')
+						for (var i = 0; i < resultArr.length; i++) {
+							categoryArr[i] = resultArr[i].split(' ')
+						}
+
+						if(categoryArr.length){
+							for (var i = 0; i < categoryArr.length; i++) {
+								var newCateDom = $('<option value="'+ categoryArr[i][0] +'">'+ categoryArr[i][0] +'</option>')
+								newCateDom.css('background-color',categoryArr[i][1])
+								$(".category").append(newCateDom);
+								$(".category :last-child").attr('selected','selected').siblings().attr('selected',false)
+							}
+						}
+
+					}
+					reader.readAsText(file);
+			}
+
+
+
+
+		}
+
+
+	});
 
 	$("#color").val('#' + Math.floor(Math.random()*16777215).toString(16))
-	$("#addCate").click(function(){
-		var newCate = $(".newCateInput").val()
-		var color =  $("#color").val()
-		if(color === '#000000') {
-			alert('不能选择黑色作为填充色')
-			return
-		}
+	// $("#addCate").click(function(){
+	// 	var newCate = $(".newCateInput").val()
+	// 	var color =  $("#color").val()
+	// 	if(color === '#000000') {
+	// 		alert('不能选择黑色作为填充色')
+	// 		return
+	// 	}
+	//
+	// 	if (newCate) {
+	// 		categoryArr.push([newCate,color]);
+	// 		// window.localStorage["data"] = JSON.stringify(categoryArr)
+	// 		var newCateDom = $('<option value="'+ newCate +'">'+ newCate +'</option>')
+	// 		// newCateDom.selected = 'true'
+	// 		newCateDom.css('background-color',color)
+	// 		$(".category").append(newCateDom);
+	// 		if($(".category option:selected")[0]){
+	// 			$(".category option:selected")[0].selected = ''
+	// 		}
+	// 		$(".category :last-child").attr('selected','selected').siblings().attr('selected',false)
+	// 		$(".newCateInput").val('')
+	//
+	// 		var newColor = '#' + Math.floor(Math.random()*16777215).toString(16)
+	//
+	// 		if (newColor==='#ffffff'){
+	// 			var newColor = '#' + Math.floor(Math.random()*16777215).toString(16)
+	// 		}
+	// 		$("#color").val(newColor)
+	// 	}
 
-		if (newCate) {
-			categoryArr.push([newCate,color]);
-			window.localStorage["data"] = JSON.stringify(categoryArr)
-			var newCateDom = $('<option value="'+ newCate +'">'+ newCate +'</option>')
-			// newCateDom.selected = 'true'
-			newCateDom.css('background-color',color)
-			$(".category").append(newCateDom);
-			if($(".category option:selected")[0]){
-				$(".category option:selected")[0].selected = ''
-			}
-			$(".category :last-child").attr('selected','selected').siblings().attr('selected',false)
-			$(".newCateInput").val('')
 
-			var newColor = '#' + Math.floor(Math.random()*16777215).toString(16)
-
-			if (newColor==='#ffffff'){
-				var newColor = '#' + Math.floor(Math.random()*16777215).toString(16)
-			}
-			$("#color").val(newColor)
-		}
-
-
-	})
+	// })
 
 	function getRGB(hex){
     var rgb=[0,0,0];
@@ -980,17 +1005,17 @@ var oriWidth,
 	//从 localstorage 初始化 categoryw
 
 	var categoryArr = [];
-  if (window.localStorage.data){
-		categoryArr = JSON.parse(window.localStorage.data)
-	}
-	if(categoryArr.length){
-		for (var i = 0; i < categoryArr.length; i++) {
-			var newCateDom = $('<option value="'+ categoryArr[i][0] +'">'+ categoryArr[i][0] +'</option>')
-			newCateDom.css('background-color',categoryArr[i][1])
-			$(".category").append(newCateDom);
-			$(".category :last-child").attr('selected','selected').siblings().attr('selected',false)
-		}
-	}
+  // if (window.localStorage.data){
+	// 	categoryArr = JSON.parse(window.localStorage.data)
+	// }
+	// if(categoryArr.length){
+	// 	for (var i = 0; i < categoryArr.length; i++) {
+	// 		var newCateDom = $('<option value="'+ categoryArr[i][0] +'">'+ categoryArr[i][0] +'</option>')
+	// 		newCateDom.css('background-color',categoryArr[i][1])
+	// 		$(".category").append(newCateDom);
+	// 		$(".category :last-child").attr('selected','selected').siblings().attr('selected',false)
+	// 	}
+	// }
 
 	$("#delCate").click(function(){
 		let delVal = $(".category option:checked").val()
@@ -1002,7 +1027,7 @@ var oriWidth,
 			preCurrChecked[0].selected = 'selected'
 
 		}
-		window.localStorage["data"] = JSON.stringify(categoryArr)
+		// window.localStorage["data"] = JSON.stringify(categoryArr)
 
 	})
 
