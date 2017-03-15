@@ -30,12 +30,18 @@
        <input type="checkbox" value="1" id="showBear" checked="checked" data-labelauty="显示轻松熊" name="">
        <!-- <label for="auto"></label> -->
      </div>
+     <div class="checkboxThree">
+       <input type="checkbox" value="1" id="allMove"  data-labelauty="整体移动" name="">
+       <!-- <label for="auto"></label> -->
+     </div>
+     <p class="adjust">调整标记点大小</p>
+     <input  type="range" id='adjust' value="10" max="100"></input>
   </div>
 
   <div id='mask' class='mask'><p>努力涂色中....</p></div>
   <div id='mask2'class='mask'><p>努力涂色并下载中....</p></div>
   <div id="previewMask" ></div>
-  <img id="preview" src=""></img>
+  <img id="preview"  src=""></img>
   <canvas id="myCanvas"  ></canvas>
 
   <div class = 'topBar'>
@@ -86,7 +92,7 @@
 
   </div>
 
-
+  <div id="dotBox" ></div>
 
 
 
@@ -159,9 +165,14 @@ $(function(){
   $('#toolsBar').attr("disabled",false);
   $('#bonySave').addClass("disabled");
 
+  $('#adjust').on('input propertychange',function(){
+        $('.markDot').css('width',$('#adjust').val() + 'px');
+        $('.markDot').css('height',$('#adjust').val() + 'px');
+
+  })
 
   $('#clearResult').click(function(){
-    var msg = "这样做会清楚所有结果,不可恢复\n\n请确认！";
+    var msg = "这样做会清除所有结果,不可恢复\n\n请确认！";
     if (confirm(msg)==true){
       $('#resultArea').val('')
       resultArr = []
@@ -203,7 +214,7 @@ $(function(){
 
     for (var i = 0; i < dotNameArr.length; i++) {
       let newDot = $('<div class="markDot ' + dotNameArr[i] +'" name="mask'+currMaskIndex +'_' + dotNameArr[i] +'" ><div class="innerText">'+dotNameArrShort[i]+'</div></div>')
-      $("body").prepend(newDot)
+      $("#dotBox").prepend(newDot)
     }
 
 
@@ -237,7 +248,7 @@ $(function(){
     } else {
       alert('未知错误')
     }
-    console.log( resultArr)
+    // console.log( resultArr)
     // $(this).parent().remove()
   })
 
@@ -245,6 +256,7 @@ $(function(){
     $('.rightMenu').remove()
   })
   var showBear = true;
+  var allMove = false;
   $('#showBear').click(function(){
 
     if(showBear){
@@ -254,6 +266,11 @@ $(function(){
     }
       showBear = !showBear
   })
+
+  $('#allMove').click(function(){
+      allMove = !allMove
+  })
+
   $('.dowebok').on("click","input",function(){
     let model = $(this)[0].value
 
@@ -345,8 +362,15 @@ $(function(){
 
   $('body').on("mousemove",function(e){
     if(dotMove){
-      currentDot.css("left",e.pageX-5)
-      currentDot.css("top",e.pageY-5)
+      let dotOffset = parseInt($('.markDot')[0].style.width)/2 || 5
+      // console.log(dotOffset)
+      if(allMove){
+        $('#dotBox').css("left",e.pageX-currentDot[0].offsetLeft-dotOffset)
+        $('#dotBox').css("top",e.pageY-currentDot[0].offsetTop-dotOffset)
+      } else {
+        currentDot.css("left",e.pageX-dotOffset-$('#dotBox')[0].offsetLeft)
+        currentDot.css("top",e.pageY-dotOffset-$('#dotBox')[0].offsetTop)
+      }
     }
   })
 
@@ -1127,8 +1151,22 @@ $(function(){
 
   // $("#fileListInput").val('BG1.jpg\nBG2.jpg')
   // $("#genFileList").click()
+  //
+  // $('.markDot').remove()
+  // $('#submit').addClass("disabled");
+  // $('#clearCanvas').addClass("disabled");
+  // $('.bonybt').removeClass("disabled");
+  // $('#toolsBar').attr("disabled",true);
+  // mode = 'bony'
+  //
+  // $('#previewMask').css('z-index',10)  //开启遮罩层, 避免选中问题
+  // $('#myCanvas').css('opacity',0)   //隐藏canvas 层
+  // $('.markDot').css('opacity',1)    //开启关节点
+  // $('.markDot').css('z-index',998)
+  // $('#bonySave').removeClass("disabled");
+  // $('#seg').attr('disabled',true)
 
-  console.log(resultArr)
+  // console.log(resultArr)
 });
 
 
