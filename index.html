@@ -16,26 +16,18 @@
 	   <div id = "logo">
 			<img draggable="false"src="images/logo.png"></img>
 	   </div>
-     <p>图片文件列表</p>
+     <p>图片文件列表222</p>
      <a  id ="genFileList"  class="dow" disabled = "disabled" > 生成文件列表</a>
      <textarea id = "fileListInput" placeholder="将文件名字列表复制到这里"></textarea>
      <div id = "fileList"> </div>
+
 
 
      <a id ="preImg" disabled= "false" class="dowLit" > 上一张</a>
      <a id ="nextImg" disabled="disabled"  class="dowLit"> 下一张</a>
 
 		 <input type="file" id="file" />
-     <div class="checkboxThree">
-       <input type="checkbox" value="1" id="showBear" checked="checked" data-labelauty="显示轻松熊" name="">
-       <!-- <label for="auto"></label> -->
-     </div>
-     <div class="checkboxThree">
-       <input type="checkbox" value="1" id="allMove"  data-labelauty="整体移动" name="">
-       <!-- <label for="auto"></label> -->
-     </div>
-     <p class="adjust">调整标记点大小</p>
-     <input  type="range" id='adjust' value="10" max="100"></input>
+
   </div>
 
   <div id='mask' class='mask'><p>努力涂色中....</p></div>
@@ -57,12 +49,16 @@
   		<div id= 'markDiv'>
         <a id ="submit" class="dowLit2 cube"  > 保存</a>
         <a id ="clearCanvas" class="dowLit2 cube"  > 清除</a>
-  			<input class='newCateInput' placeholder="在这里添加标签"/>
-  			<input id="color" type="color"/>
 
-  			<a id ="addCate" class="dowSLit" >+</a>
-  			<a id ="delCate" class="dowSLit" >-</a>
   		</div>
+      <div id= 'labelDiv'>
+        <input class='newCateInput' placeholder="在这里添加标签"/>
+
+        <div id='labelBtn'><input id="color" type="color"/>
+        <a id ="addCate" class="dowSLit" >+</a>
+        <a id ="delCate" class="dowSLit" >-</a>
+      </div>
+      </div>
   		<div id= 'storeDiv'>
   			<select multiple id ="toolsBar" >
   				<option value="brush" selected=true>画笔工具</option>
@@ -72,22 +68,7 @@
   			</select>
 
   		</div>
-      <span class="modeChoice">模式选择</span>
-      <ul class="dowebok">
-        <li><input type="radio" name="segment" value="seg"  id="seg" checked data-labelauty="← 语义分割"></li>
-        <li><input type="radio" name="segment" value="bony" id="bony" data-labelauty="人体关节点 →"></li>
-      </ul>
-      <div id= 'bonyBox'>
 
-        <a  class="dowLit2 bonybt" id="addNewDots"> 添加节点</a>
-        <!-- <a  class="dowLit bonybt"  id="removeNewDots"> 移除一组节点</a><br> -->
-        <a id ="bonySave" class="dowLit2"  > 保存节点</a>
-
-      </div>
-      <div id="resultDiv">
-        <a id ="clearResult" class="dowLit2"  > 清空结果</a>
-        <textarea id="resultArea"></textarea>
-      </div>
   	</div>
 
   </div>
@@ -413,7 +394,7 @@ $(function(){
 					// console.log(i,j)
 					targetColor = oGC.getImageData(i, j,1,1).data
 
-					 if( targetColor[3] == 0 ){
+					 if( targetColor[3] <= 250 ){
 						 var imgData=oGC.createImageData(1,1);
 						 imgData.data[0]=0;
 						 imgData.data[1]=0;
@@ -440,13 +421,7 @@ $(function(){
     obj.image = fileName
     obj.category = $(".category option:checked").val()
 
-    resultArr.push(obj)
 
-    outputToTA( )
-
-    $("#resultArea").animate({scrollTop:$("#resultArea")[0].scrollHeight - $("#resultArea").height()},1000) ;
-
-    $('#bony').attr('disabled',false)
     // $('#seg').attr('disabled',true)
 	})
 
@@ -1006,7 +981,7 @@ $(function(){
 		};
 		return rgb;
 	}
-
+  var threshold = 10;
 	function scanLine(x,y,rgba,compareColor) {
 	  seedStack.push([x-200,y-140])
 
@@ -1036,7 +1011,7 @@ $(function(){
 	    //find xleft
 	    i = 1
 	    targetColor = oGC.getImageData(currenSeed[0]-i, currenSeed[1],1,1).data
-	    while(targetColor[3] < 10){
+	    while(targetColor[3] < threshold){
 	      fillColor(currenSeed[0]-i,currenSeed[1],rgba)
 	      xLeft = currenSeed[0]-i
 	      i++
@@ -1046,7 +1021,7 @@ $(function(){
 	    //find xRight
 	    i = 0
 	    targetColor = oGC.getImageData(currenSeed[0]+i, currenSeed[1],1,1).data
-	    while(targetColor[3] < 10){
+	    while(targetColor[3] < threshold){
 	      fillColor(currenSeed[0]+i,currenSeed[1],rgba)
 	      xRight = currenSeed[0]+i
 	      i++
@@ -1059,12 +1034,12 @@ $(function(){
 	    candidateSeed = 0
 	    for (var i = xLeft; i <= xRight; i++) {
 	      targetColor = oGC.getImageData(i, currenSeed[1]+1,1,1).data
-	      if(targetColor[3] < 10 && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] ) ){
+	      if(targetColor[3] < threshold && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] ) ){
 	        candidateSeed = i
 	      }
 	      else {
 	        targetColor = oGC.getImageData(i - 1, currenSeed[1]+1,1,1).data
-	        if(targetColor[3] < 10 && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] )){
+	        if(targetColor[3] < threshold && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] )){
 	          // fillColor(candidateSeed+100,currenSeed[1]+1,[0,255,255,255])
 	          seedStack.push([i - 1,currenSeed[1]+1])
 	        }
@@ -1080,12 +1055,12 @@ $(function(){
 	    candidateSeed = 0
 	    for (var i = xLeft; i <= xRight; i++) {
 	      targetColor = oGC.getImageData(i, currenSeed[1]-1,1,1).data
-	      if(targetColor[3] < 10 && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] )){
+	      if(targetColor[3] < threshold && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] )){
 	        candidateSeed = i
 	      }
 	      else {
 	        targetColor = oGC.getImageData(i - 1, currenSeed[1]-1,1,1).data
-	        if(targetColor[3] < 10 && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] ) ){
+	        if(targetColor[3] < threshold && (rgba[0]!=targetColor[0] || rgba[1]!=targetColor[1] || rgba[2]!=targetColor[2] ) ){
 	          // fillColor(candidateSeed+100,currenSeed[1]-1,[0,255,255,255])
 	          seedStack.push([i - 1,currenSeed[1]-1])
 	          // console.log(i - 1,currenSeed[1]-1)
@@ -1138,12 +1113,6 @@ $(function(){
 
   }
 
-  if (window.localStorage.SEGRESULT) {
-    $('#resultDiv textarea').val(window.localStorage.SEGRESULT)
-    $("#resultArea").animate({scrollTop:$("#resultArea")[0].scrollHeight - $("#resultArea").height()},1000)
-
-    resultArr = JSON.parse(window.localStorage.SEGRESULT)
-  }
 
 
 	var seedStack = []

@@ -129,10 +129,17 @@ color: #fff;
 	height: 50%;
 	margin-right: 30px;
 }
+#labelDiv{
+	margin-top: 20px;
+	flex: 1
+}
 #storeDiv{
-	flex:1;
+	flex:3;
 	height: 100%;
 	/*margin-right: 30px;*/
+}
+#labelBtn{
+	margin-top: 20px
 }
 #bonyBox{
   flex:2;
