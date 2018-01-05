@@ -123,20 +123,18 @@ button{
 ::-webkit-input-placeholder { /* WebKit browsers */
 color: #fff;
 }
-#markDiv{
-	margin-top: 5px;
-  width: 130px;
-	height: 50%;
-	margin-right: 30px;
-}
-#labelDiv{
-	margin-top: 20px;
-	flex: 1
-}
+
+
 #storeDiv{
-	flex:3;
+	flex: 1;
 	height: 100%;
-	/*margin-right: 30px;*/
+	margin-left: 130px;
+}
+#markDiv{
+	flex: 5;
+	margin-top: 5px;
+  	width: 130px;
+	height: 50%;
 }
 #labelBtn{
 	margin-top: 20px

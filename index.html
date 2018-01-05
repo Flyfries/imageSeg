@@ -16,7 +16,7 @@
 	   <div id = "logo">
 			<img draggable="false"src="images/logo.png"></img>
 	   </div>
-     <p>图片文件列表222</p>
+     <p>图片文件列表</p>
      <a  id ="genFileList"  class="dow" disabled = "disabled" > 生成文件列表</a>
      <textarea id = "fileListInput" placeholder="将文件名字列表复制到这里"></textarea>
      <div id = "fileList"> </div>
@@ -40,34 +40,22 @@
   	<div class = "mousePosition"></div>
 
   	<div class="content">
-  		<div id = 'category'>
-  			<select multiple class ="category">
-  		 		<!-- <option value="heart">heart</option> -->
-  			</select>
+        <div id= 'storeDiv'>
+            <select multiple id ="toolsBar" >
+                <option value="brush" selected=true>画笔工具</option>
+                <option value="paintPot">油漆桶工具</option>
 
-  		</div>
+            </select>
+
+        </div>
+
   		<div id= 'markDiv'>
         <a id ="submit" class="dowLit2 cube"  > 保存</a>
         <a id ="clearCanvas" class="dowLit2 cube"  > 清除</a>
 
   		</div>
-      <div id= 'labelDiv'>
-        <input class='newCateInput' placeholder="在这里添加标签"/>
 
-        <div id='labelBtn'><input id="color" type="color"/>
-        <a id ="addCate" class="dowSLit" >+</a>
-        <a id ="delCate" class="dowSLit" >-</a>
-      </div>
-      </div>
-  		<div id= 'storeDiv'>
-  			<select multiple id ="toolsBar" >
-  				<option value="brush" selected=true>画笔工具</option>
-  				<option value="paintPot">油漆桶工具</option>
-  				<option value="paintPot" disabled=true>开发中..</option>
 
-  			</select>
-
-  		</div>
 
   	</div>
 
@@ -635,15 +623,15 @@ $(function(){
   			switch (tool) {
   		    case 'paintPot':
   		        $('#status').hide()
-  						if(!$(".category option:checked")[0]) {
-  							alert('请先添加颜色的样式')
-  							return
-  						}
-  						let painColorArr = $(".category option:checked")[0].style.backgroundColor.slice(4,-1).split(',')
-  						for (var i = 0; i < painColorArr.length; i++) {
-  							painColorArr[i] = +painColorArr[i].trim()
-  						}
-  						painColorArr.push(255)
+  						// if(!$(".category option:checked")[0]) {
+  						// 	alert('请先添加颜色的样式')
+  						// 	return
+  						// }
+  						// let painColorArr = $(".category option:checked")[0].style.backgroundColor.slice(4,-1).split(',')
+  						// for (var i = 0; i < painColorArr.length; i++) {
+  						// 	painColorArr[i] = +painColorArr[i].trim()
+  						// }
+  						painColorArr = [255, 255, 255, 255]; // 白色
   						$('#mask').show()
   		        window.setTimeout(function(){
   		          if(painColorArr){
